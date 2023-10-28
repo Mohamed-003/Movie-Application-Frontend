@@ -6,33 +6,33 @@
     <title>Movie List</title>
     <style>
         body {
-            background-color: #fff; /* Light red background */
-            color: #333; /* Dark text color */
+            background-color: #fff; 
+            color: #333;
             font-family: Arial, sans-serif;
             text-align: center;
         }
 
         h1 {
-            color: #e50914; /* Red header text */
+            color: #e50914; 
             font-weight: 900;
         }
 
         table {
             width: 80%;
             margin: 20px auto;
-            background-color: #fff; /* White background for the table */
+            background-color: #fff; 
             border-collapse: collapse;
-            border: 1px solid rgba(0, 0, 0, 0.7); /* Red border */
+            border: 1px solid rgba(0, 0, 0, 0.7); 
         }
 
         th, td {
-            border: 1px solid rgba(0, 0, 0, 0.7); /* Red border for cells */
+            border: 1px solid rgba(0, 0, 0, 0.7); 
             padding: 10px;
         }
 
         th {
-            background-color: rgba(0, 0, 0, 0.7); /* Red header background */
-            color: #fff; /* White header text */
+            background-color: rgba(0, 0, 0, 0.7); 
+            color: #fff; 
             font-weight: 800;
             width: 30px;
         }
@@ -45,13 +45,13 @@
         }
 
         tr:nth-child(even) {
-            background-color: #ffcccb; /* Light red background for even rows */
+            background-color: #ffcccb; 
         }
 
         .btn {
             padding: 5px 10px;
-            background-color: #e50914; /* Red button background */
-            color: #fff; /* White text */
+            background-color: #e50914; 
+            color: #fff; 
             border: none;
             cursor: pointer;
             border-radius: 5px;
@@ -59,7 +59,7 @@
         }
 
         .btn:hover {
-            background-color: #ff353c; /* Darker red on hover */
+            background-color: #ff353c; 
         }
         .date{
             min-width: 8rem;
@@ -111,22 +111,13 @@
         }
 
         function updateContent() {
-            // const outputElement = document.getElementById("output");
-            // outputElement.textContent = "Content updated using 'useEffect'-like behavior.";
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("token", sessionStorage.getItem("token"));
             myHeaders.append("id", Number(sessionStorage.getItem("id")));
-
-            // var raw = JSON.stringify({
-            //     "token": sessionStorage.getItem("token"),
-            // "userId": Number(sessionStorage.getItem("id"))
-            // });
-
             var requestOptions = {
             method: 'GET',
             headers: myHeaders,
-            // body: raw,
             redirect: 'follow'
             };
 
@@ -144,14 +135,14 @@
                         const dataAuthorId= String(obj["authorId"])??null;
                         const inputDate = obj["releaseDate"];
                         const parsedDate = new Date(inputDate);
-                        parsedDate.setDate(parsedDate.getDate() - 1); // Subtract a day
-                        parsedDate.setHours(6); // Set the hours to 6
-                        parsedDate.setMinutes(53); // Set the minutes to 53
-                        parsedDate.setSeconds(0); // Set the seconds to 0
-                        parsedDate.setMilliseconds(0); // Set the milliseconds to 0
-                        const outputDate = parsedDate.toISOString().slice(0, -1); // Remove the "Z" at the end
+                        parsedDate.setDate(parsedDate.getDate() - 1); 
+                        parsedDate.setHours(6); 
+                        parsedDate.setMinutes(53); 
+                        parsedDate.setSeconds(0); 
+                        parsedDate.setMilliseconds(0); 
+                        const outputDate = parsedDate.toISOString().slice(0, -1);
 
-                        console.log(outputDate); // Output: "2023-10-26T06:53:00.000"
+                
 
                     let row = `
                     <tr>
@@ -223,20 +214,19 @@
                             rowData["cast"] = castArray;
                             break;
                         case "Release Date":
-                            // rowData[Key]= cell.querySelector('input[type="datetime-local"]').value;
+                           
                             let unConverted = cell.querySelector('input[type="datetime-local"]').value;
                             const inputDate = "2023-10-26T06:53";
                             const parsedDate = new Date(inputDate);
 
-                            // Add a day, hours, minutes, and seconds to the parsed date
-                            parsedDate.setDate(parsedDate.getDate() + 1); // Add a day
-                            parsedDate.setHours(13); // Set the hours to 13
-                            parsedDate.setMinutes(44); // Set the minutes to 44
-                            parsedDate.setSeconds(46); // Set the seconds to 46
-                            parsedDate.setMilliseconds(614); // Set the milliseconds to 614
+                           
+                            parsedDate.setDate(parsedDate.getDate() + 1); 
+                            parsedDate.setHours(13); 
+                            parsedDate.setMinutes(44); 
+                            parsedDate.setSeconds(46); 
+                            parsedDate.setMilliseconds(614); 
                             rowData["releaseDate"]=parsedDate.toISOString();
-                            // Convert the date to an ISO string with the "Z" timezone
-                            // const outputDate = parsedDate.toISOString();
+                            
 
 
                             break;
