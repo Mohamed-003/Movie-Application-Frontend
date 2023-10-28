@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie List</title>
+    <style>
+        body {
+            background-color: #fff; /* Light red background */
+            color: #333; /* Dark text color */
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #e50914; /* Red header text */
+            font-weight: 900;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff; /* White background for the table */
+            border-collapse: collapse;
+            border: 1px solid rgba(0, 0, 0, 0.7); /* Red border */
+        }
+
+        th, td {
+            border: 1px solid rgba(0, 0, 0, 0.7); /* Red border for cells */
+            padding: 10px;
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.7); /* Red header background */
+            color: #fff; /* White header text */
+            font-weight: 800;
+            width: 30px;
+        }
+        td{
+            font-style: italic;
+            font-size: small;
+            font-weight: 600;
+            max-width: 15px;
+            min-width: 5rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: #ffcccb; /* Light red background for even rows */
+        }
+
+        .btn {
+            padding: 5px 10px;
+            background-color: #e50914; /* Red button background */
+            color: #fff; /* White text */
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: 700;
+        }
+
+        .btn:hover {
+            background-color: #ff353c; /* Darker red on hover */
+        }
+        .date{
+            min-width: 8rem;
+        }
+       
+    </style>
+</head>
+<body>
+    <h1>Movie List</h1>
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Movie Name</th>
+                <th>Rating</th>
+                <th>Cast</th>
+                <th>Genre</th>
+                <th>Release Date</th>
+                <th>Delete Movie </th>
+                <th>Add Movie</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td contenteditable="true"  >3 Idiots</td>
+                <td contenteditable="true"  >8.0</td>
+                <td contenteditable="true"  >Amir Khan,  Madhavan, Sharam Joshi</td>
+                <td contenteditable="true"   >Drama</td>
+                <td class="date"  ><input type="datetime-local"  id="datetime" value="2009-12-25T00:00" name="datetime"></td>
+                <td><button class="btn" onclick="deleteRow(this)">Delete</button></td>
+                <td><button class="btn " id="addMovie" onclick="addRow(this)">Add</button></td>
+                
+            </tr>
+        </tbody>
+    </table>
+    <div class="d-flex ">
+        <button class="btn" id="submit" onclick="submit()">Submit</button>
+        <button class="btn"  onclick="logout()">Logout</button>
+       
+        
+    </div>
+    
+    
+    <script>
+         document.addEventListener("DOMContentLoaded", updateContent);
+        
+        function logout(){
+            sessionStorage.clear();
+            window.location.href = "login.html";
+        }
+
+        function updateContent() {
+            // const outputElement = document.getElementById("output");
+            // outputElement.textContent = "Content updated using 'useEffect'-like behavior.";
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("token", sessionStorage.getItem("token"));
+            myHeaders.append("id", Number(sessionStorage.getItem("id")));
+
+            // var raw = JSON.stringify({
+            //     "token": sessionStorage.getItem("token"),
+            // "userId": Number(sessionStorage.getItem("id"))
+            // });
+
+            var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            // body: raw,
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:3000/movie", requestOptions)
+            .then(response => response.text())
+            .then(result => { 
+                const tableData = JSON.parse(result).movies;
+                const buttonElement = document.getElementById("addMovie");
+                const row = buttonElement.parentNode.parentNode;
+                
+                let tableInnerHtml=``;
+                if(tableData){
+                    tableData.map((obj)=>{
+                        const dataId= String(obj["id"])??null;
+                        const dataAuthorId= String(obj["authorId"])??null;
+                        const inputDate = obj["releaseDate"];
+                        const parsedDate = new Date(inputDate);
+                        parsedDate.setDate(parsedDate.getDate() - 1); // Subtract a day
+                        parsedDate.setHours(6); // Set the hours to 6
+                        parsedDate.setMinutes(53); // Set the minutes to 53
+                        parsedDate.setSeconds(0); // Set the seconds to 0
+                        parsedDate.setMilliseconds(0); // Set the milliseconds to 0
+                        const outputDate = parsedDate.toISOString().slice(0, -1); // Remove the "Z" at the end
+
+                        console.log(outputDate); // Output: "2023-10-26T06:53:00.000"
+
+                    let row = `
+                    <tr>
+                    <td contenteditable="true" id=${dataId} authorId=${dataAuthorId}  >${obj["movieName"]}</td>
+                    <td contenteditable="true" id=${dataId} authorId=${dataAuthorId} >${obj["rating"]}</td>
+                    <td contenteditable="true"  id=${dataId} authorId=${dataAuthorId} >${obj["cast"]}</td>
+                    <td contenteditable="true" id=${dataId} authorId=${dataAuthorId} >${obj["genre"]}</td>
+                    <td  class="date" ><input type="datetime-local" value=${outputDate}  id="datetime" name="datetime"></td>
+                    <td><button class="btn" onclick="deleteRow(this)">Delete</button></td>
+                    <td><button class="btn" onclick="addRow(this)">Add</button></td>
+                    </tr>
+                    `
+                    tableInnerHtml = tableInnerHtml+row;
+
+                })
+                }else{
+                    let row =`
+                    <td contenteditable="true"  >New Movie</td>
+                    <td contenteditable="true"  >0.0</td>
+                    <td contenteditable="true"   >Actor 1, Actor 2</td>
+                    <td contenteditable="true"  >Genre</td>
+                    <td  class="date" ><input type="datetime-local" value="2023-10-26T06:53"  id="datetime" name="datetime"></td>
+                    <td><button class="btn" onclick="deleteRow(this)">Delete</button></td>
+                    <td><button class="btn" onclick="addRow(this)">Add</button></td>
+                    `;
+                    tableInnerHtml = tableInnerHtml+row;
+                }
+                const newRow= row.parentNode.innerHTML=tableInnerHtml;
+                })
+            .catch(error => console.log('error', error));
+        }
+
+       
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+        function addRow(button) {
+            const row = button.parentNode.parentNode;
+            const newRow= row.parentNode.insertRow(row.length);
+            newRow.innerHTML = `
+                <td contenteditable="true"  >New Movie</td>
+                <td contenteditable="true"  >0.0</td>
+                <td contenteditable="true"   >Actor 1, Actor 2</td>
+                <td contenteditable="true"  >Genre</td>
+                <td  class="date" ><input type="datetime-local" value="2023-10-26T06:53"  id="datetime" name="datetime"></td>
+                <td><button class="btn" onclick="deleteRow(this)">Delete</button></td>
+                <td><button class="btn" onclick="addRow(this)">Add</button></td>
+            `;
+        }
+
+        function submit(){
+            const table = document.getElementById("myTable");
+            const tableData = [];
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = {};
+                let id;
+                let authorId;
+
+                for (let j = 0; j < row.cells.length; j++) {
+                    const cell = row.cells[j];
+                    const Key = table.rows[0].cells[j].textContent;
+                    authorId = cell.getAttribute("authorId");
+                    id = cell.getAttribute("id");
+                    switch(Key){
+                        case "Cast":
+                            const castArray= cell.textContent.split(",");
+                            rowData["cast"] = castArray;
+                            break;
+                        case "Release Date":
+                            // rowData[Key]= cell.querySelector('input[type="datetime-local"]').value;
+                            let unConverted = cell.querySelector('input[type="datetime-local"]').value;
+                            const inputDate = "2023-10-26T06:53";
+                            const parsedDate = new Date(inputDate);
+
+                            // Add a day, hours, minutes, and seconds to the parsed date
+                            parsedDate.setDate(parsedDate.getDate() + 1); // Add a day
+                            parsedDate.setHours(13); // Set the hours to 13
+                            parsedDate.setMinutes(44); // Set the minutes to 44
+                            parsedDate.setSeconds(46); // Set the seconds to 46
+                            parsedDate.setMilliseconds(614); // Set the milliseconds to 614
+                            rowData["releaseDate"]=parsedDate.toISOString();
+                            // Convert the date to an ISO string with the "Z" timezone
+                            // const outputDate = parsedDate.toISOString();
+
+
+                            break;
+                        case "Rating":
+                            rowData["rating"]= Number(cell.textContent);
+                            break;
+                        case "Movie Name":
+                            rowData["movieName"] = cell.textContent
+                            break;
+                        case "Genre":
+                            rowData["genre"] = cell.textContent
+                            break;
+                        
+                    }
+                }
+                tableData.push(rowData);
+            }
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("token", sessionStorage.getItem("token"));
+            myHeaders.append("id", Number(sessionStorage.getItem("id")));
+
+            var raw = JSON.stringify({
+            "list": tableData
+            });
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:3000/movie/update", requestOptions)
+            .then(response => response.text())
+            .then(result => console.log(result))
+            .catch(error => console.log('error', error));
+                    }
+    </script>
+</body>
+</html>
